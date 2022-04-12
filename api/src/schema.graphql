@@ -2,49 +2,45 @@ scalar Point
 scalar DateTime
 scalar PointInput
 
-type User {
-  userId: ID!
+type Collection {
+  collectionId: ID!
   name: String
-  reviews: [Review] @relationship(type: "WROTE", direction: OUT)
-  avgStars: Float
-    @cypher(
-      statement: "MATCH (this)-[:WROTE]->(r:Review) RETURN toFloat(avg(r.stars))"
-    )
-  numReviews: Int
-    @cypher(statement: "MATCH (this)-[:WROTE]->(r:Review) RETURN COUNT(r)")
-  recommendations(first: Int = 3): [Business]
-    @cypher(
-      statement: "MATCH (this)-[:WROTE]->(r:Review)-[:REVIEWS]->(:Business)<-[:REVIEWS]-(:Review)<-[:WROTE]-(:User)-[:WROTE]->(:Review)-[:REVIEWS]->(rec:Business) WHERE NOT EXISTS( (this)-[:WROTE]->(:Review)-[:REVIEWS]->(rec) ) WITH rec, COUNT(*) AS num ORDER BY num DESC LIMIT $first RETURN rec"
-    )
+  releases: [Release] @relationship(type: "CONTAINS", direction: OUT)
+  numReleases: Int
+    @cypher(statement: "MATCH (this)-[:CONTAINS]->(r:Release) RETURN COUNT(r)")
 }
 
-type Business {
-  businessId: ID!
-  name: String!
-  address: String
-  city: String
-  state: String
-  location: Point
-  avgStars: Float
-    @cypher(
-      statement: "MATCH (this)<-[:REVIEWS]-(r:Review) RETURN coalesce(avg(r.stars),0.0)"
-    )
-  reviews: [Review] @relationship(type: "REVIEWS", direction: IN)
-  categories: [Category] @relationship(type: "IN_CATEGORY", direction: OUT)
+type Release {
+  releaseId: ID!
+  title: String
+  thumb: String
+  rating: Int
+  year: Int
+  tracks: [Track] @relationship(type: "CONTAINS", direction: OUT)
+  artists: [Artist] @relationship(type: "MADE", direction: IN)
 }
 
-type Review {
-  reviewId: ID!
-  stars: Float
-  text: String
-  date: DateTime
-  business: Business @relationship(type: "REVIEWS", direction: OUT)
-  user: User @relationship(type: "WROTE", direction: IN)
+type Track {
+  trackId: ID!
+  title: String
+  position: String
+  duration: String
+  mixes: [Mix] @relationship(type: "FADEOUT", direction: OUT)
+  mixes: [Mix] @relationship(type: "FADEIN", direction: IN)
+  artists: [Artist] @relationship(type: "MADE", direction: IN)
 }
 
-type Category {
-  name: ID!
-  businesses: [Business] @relationship(type: "IN_CATEGORY", direction: IN)
+type Artist {
+  artistId: ID!
+  name: String
+  releases: [Release] @relationship(type: "MADE", direction: OUT)
+  tracks: [Track] @relationship(type: "MADE", direction: OUT)
+}
+
+type Mix {
+  mixId: ID!
+  tracks: [Track] @relationship(type: "FADEOUT", direction: IN)
+  tracks: [Track] @relationship(type: "FADEIN", direction: OUT)
 }
 
 type RatingCount @exclude {
