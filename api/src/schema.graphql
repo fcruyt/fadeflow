@@ -43,7 +43,7 @@ type Mix {
   tracks: [Track] @relationship(type: "FADEIN", direction: OUT)
 }
 
-type RatingCount @exclude {
+""" type RatingCount @exclude {
   stars: Float!
   count: Int!
 }
@@ -90,3 +90,4 @@ type Query {
       statement: "MATCH (r:Review) WITH r.stars AS stars, COUNT(*) AS count ORDER BY stars RETURN {stars: stars, count: count}"
     )
 }
+ """
