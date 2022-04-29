@@ -5,89 +5,87 @@ scalar PointInput
 type Collection {
   collectionId: ID!
   name: String
-  releases: [Release] @relationship(type: "CONTAINS", direction: OUT)
+  releases: [Release] @relationship(type: "HAS", direction: OUT)
   numReleases: Int
-    @cypher(statement: "MATCH (this)-[:CONTAINS]->(r:Release) RETURN COUNT(r)")
+    @cypher(statement: "MATCH (this)-[:HAS]->(r:Release) RETURN COUNT(r)")
 }
 
 type Release {
   releaseId: ID!
   title: String
   thumb: String
-  rating: Int
   year: Int
-  tracks: [Track] @relationship(type: "CONTAINS", direction: OUT)
-  artists: [Artist] @relationship(type: "MADE", direction: IN)
+  # tracks: [Track] @relationship(type: "CONTAINS", direction: OUT)
+  # artists: [Artist] @relationship(type: "MADE", direction: IN)
 }
 
-type Track {
-  trackId: ID!
-  title: String
-  position: String
-  duration: String
-  mixes: [Mix] @relationship(type: "FADEOUT", direction: OUT)
-  mixes: [Mix] @relationship(type: "FADEIN", direction: IN)
-  artists: [Artist] @relationship(type: "MADE", direction: IN)
-}
+# type Track {
+#   trackId: ID!
+#   title: String
+#   position: String
+#   duration: String
+#   mixes: [Mix] @relationship(type: "FADEOUT", direction: OUT)
+#   mixes: [Mix] @relationship(type: "FADEIN", direction: IN)
+#   artists: [Artist] @relationship(type: "MADE", direction: IN)
+# }
 
-type Artist {
-  artistId: ID!
-  name: String
-  releases: [Release] @relationship(type: "MADE", direction: OUT)
-  tracks: [Track] @relationship(type: "MADE", direction: OUT)
-}
+# type Artist {
+#   artistId: ID!
+#   name: String
+#   releases: [Release] @relationship(type: "MADE", direction: OUT)
+#   tracks: [Track] @relationship(type: "MADE", direction: OUT)
+# }
 
-type Mix {
-  mixId: ID!
-  tracks: [Track] @relationship(type: "FADEOUT", direction: IN)
-  tracks: [Track] @relationship(type: "FADEIN", direction: OUT)
-}
+# type Mix {
+#   mixId: ID!
+#   tracks: [Track] @relationship(type: "FADEOUT", direction: IN)
+#   tracks: [Track] @relationship(type: "FADEIN", direction: OUT)
+# }
 
-""" type RatingCount @exclude {
-  stars: Float!
-  count: Int!
-}
+# type RatingCount @exclude {
+#   stars: Float!
+#   count: Int!
+# }
 
-type Mutation {
-  mergeBusinessCategory(categories: [String!]!, businessId: ID!): Business
-    @cypher(
-      statement: "MATCH (b:Business {businessId: $businessId}) UNWIND $categories AS cat MERGE (c:Category {name: cat}) MERGE (b)-[:IN_CATEGORY]->(c) RETURN b"
-    )
-  mergeUser(name: String!, userId: ID!): User
-    @cypher(
-      statement: """
-      MERGE (u:User {userId: $userId})
-      ON CREATE SET u.name = $name
-      RETURN u
-      """
-    )
-  mergeBusiness(
-    businessId: ID!
-    name: String!
-    address: String!
-    city: String!
-    state: String!
-    latitude: Float!
-    longitude: Float!
-  ): Business
-    @cypher(
-      statement: """
-      MERGE (b:Business {businessId: $businessId})
-      ON CREATE SET b.name = $name,
-                    b.address = $address,
-                    b.city = $city,
-                    b.state = $state,
-                    b.location = Point({latitude: $latitude, longitude: $longitude})
-      RETURN b
-      """
-    )
-}
+# type Mutation {
+#   mergeBusinessCategory(categories: [String!]!, businessId: ID!): Business
+#     @cypher(
+#       statement: "MATCH (b:Business {businessId: $businessId}) UNWIND $categories AS cat MERGE (c:Category {name: cat}) MERGE (b)-[:IN_CATEGORY]->(c) RETURN b"
+#     )
+#   mergeUser(name: String!, userId: ID!): User
+#     @cypher(
+#       statement: """
+#       MERGE (u:User {userId: $userId})
+#       ON CREATE SET u.name = $name
+#       RETURN u
+#       """
+#     )
+#   mergeBusiness(
+#     businessId: ID!
+#     name: String!
+#     address: String!
+#     city: String!
+#     state: String!
+#     latitude: Float!
+#     longitude: Float!
+#   ): Business
+#     @cypher(
+#       statement: """
+#       MERGE (b:Business {businessId: $businessId})
+#       ON CREATE SET b.name = $name,
+#                     b.address = $address,
+#                     b.city = $city,
+#                     b.state = $state,
+#                     b.location = Point({latitude: $latitude, longitude: $longitude})
+#       RETURN b
+#       """
+#     )
+# }
 
-type Query {
-  userCount: Int! @cypher(statement: "MATCH (u:User) RETURN COUNT(u)")
-  ratingsCount: [RatingCount]
-    @cypher(
-      statement: "MATCH (r:Review) WITH r.stars AS stars, COUNT(*) AS count ORDER BY stars RETURN {stars: stars, count: count}"
-    )
-}
- """
+# type Query {
+#   userCount: Int! @cypher(statement: "MATCH (u:User) RETURN COUNT(u)")
+#   ratingsCount: [RatingCount]
+#     @cypher(
+#       statement: "MATCH (r:Review) WITH r.stars AS stars, COUNT(*) AS count ORDER BY stars RETURN {stars: stars, count: count}"
+#     )
+# }
